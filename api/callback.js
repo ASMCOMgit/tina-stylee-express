@@ -1,5 +1,7 @@
 import dotenv from 'dotenv';
 import fetch from 'node-fetch';
+import fs from 'fs';
+import path from 'path';
 
 dotenv.config();
 
@@ -27,7 +29,9 @@ export default async function callbackHandler(req, res) {
     const data = await response.json();
 
     if (data.access_token) {
-      res.json({ message: '✅ Token recebido com sucesso!', token: data });
+      const tokenPath = path.resolve('utils/token.json');
+      fs.writeFileSync(tokenPath, JSON.stringify({ access_token: data.access_token }, null, 2));
+      res.json({ message: '✅ Token salvo com sucesso!', token: data });
     } else {
       res.status(401).json({ error: 'Não foi possível obter o token', resposta: data });
     }
