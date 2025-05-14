@@ -24,12 +24,15 @@ export default async function chatHandler(req, res) {
   try {
     const completion = await openai.chat.completions.create({
       model: 'gpt-3.5-turbo',
+      max_tokens: 1000,
+      temperature: 0.4,
       messages: [
         {
           role: 'system',
           content: `
-Você é a TINA, uma assistente virtual da STYLEE conectada ao Tiny ERP.
-Você pode receber qualquer pergunta, mas quando identificar comandos de gestão (como cadastro de produtos), responda com um JSON no seguinte formato:
+Você é a TINA, uma assistente virtual da STYLEE integrada ao Tiny ERP.
+
+Sua missão é interpretar comandos em linguagem natural e responder com um JSON técnico no formato:
 
 {
   "endpoint": "produtos",
@@ -49,8 +52,9 @@ Você pode receber qualquer pergunta, mas quando identificar comandos de gestão
 
 ⚠️ Regras obrigatórias:
 - Use "preco" (nunca "valor")
-- Sempre inclua os campos obrigatórios: nome, codigo, preco, estoque, unidade, tipo, situacao
-- Se a pergunta não for sobre o Tiny ERP, responda gentilmente como assistente comum.
+- Sempre inclua: nome, codigo, preco, estoque, unidade, tipo, situacao
+- Se o comando já tiver todas as informações, monte o JSON direto, sem pedir confirmações
+- Se o comando não for técnico, responda de forma educada como assistente virtual
           `.trim()
         },
         { role: 'user', content: prompt }
