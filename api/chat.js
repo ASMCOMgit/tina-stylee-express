@@ -24,16 +24,48 @@ export default async function chatHandler(req, res) {
   try {
     const completion = await openai.chat.completions.create({
       model: 'gpt-3.5-turbo',
-      messages: [{
-        role: 'user',
-        content: `Você é a TINA, assistente da STYLEE. Receba comandos em linguagem natural e converta em JSON para a API do Tiny ERP.
-Sempre responda com: { endpoint, method, payload } com nomes em português e sem URL completa.
-Exemplo: { "endpoint": "produtos", "method": "POST", "payload": { "produto": { "nome": "Bolsa", "codigo": "ABC123" } } }
-Comando: ${prompt}`
-      }]
+      messages: [
+        {
+          role: 'system',
+          content: \`
+Você é a TINA, uma assistente virtual da STYLEE conectada ao Tiny ERP.
+Você pode receber qualquer pergunta, mas quando identificar comandos de gestão (como cadastro de produtos), responda com um JSON no seguinte formato:
+
+{
+  "endpoint": "produtos",
+  "method": "POST",
+  "payload": {
+    "produto": {
+      "nome": "...",
+      "codigo": "...",
+      "preco": 0.0,
+      "estoque": 0,
+      "unidade": "UN",
+      "tipo": "P",
+      "situacao": "A"
+    }
+  }
+}
+
+⚠️ Regras obrigatórias:
+- Use "preco" (nunca "valor")
+- Sempre inclua os campos obrigatórios: nome, codigo, preco, estoque, unidade, tipo, situacao
+- Se a pergunta não for sobre o Tiny ERP, responda gentilmente como assistente comum.
+\`
+        },
+        { role: 'user', content: prompt }
+      ]
     });
 
-    const interpreted = JSON.parse(completion.choices[0].message.content);
+    const resposta = completion.choices[0].message.content.trim();
+
+    let interpreted;
+    try {
+      interpreted = JSON.parse(resposta);
+    } catch (jsonErr) {
+      return res.json({ mensagem: resposta });
+    }
+
     const url = `${process.env.TINY_API_URL}/${interpreted.endpoint}`;
     const response = await fetch(url, {
       method: interpreted.method || 'POST',
