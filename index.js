@@ -1,9 +1,9 @@
 import express from 'express';
-import callbackHandler from './callback.js';
-import loginHandler from './login.js';
+import callbackHandler from './api/callback.js';
+import loginHandler from './api/login.js';
 import dotenv from 'dotenv';
-import chatHandler from './chat.js';
-import authRoutes from './auth.js';
+import chatHandler from './api/chat.js';
+import authRoutes from './api/auth.js';
 
 dotenv.config();
 const app = express();
