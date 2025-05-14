@@ -1,4 +1,5 @@
 import express from 'express';
+import testeTinyRoute from './routes/teste-tiny-express.js';
 import callbackHandler from './api/callback.js';
 import loginHandler from './api/login.js';
 import dotenv from 'dotenv';
@@ -9,6 +10,7 @@ dotenv.config();
 const app = express();
 app.use(express.json());
 
+app.use('/api/teste-tiny', testeTinyRoute);
 app.use('/api/auth', authRoutes);
 app.post('/api/chat', chatHandler);
 
