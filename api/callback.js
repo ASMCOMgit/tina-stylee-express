@@ -18,15 +18,20 @@ export default async function callbackHandler(req, res) {
   params.append('client_secret', process.env.TINY_CLIENT_SECRET);
 
   try {
-    const response = await fetch('https://api.tiny.com.br/api/v1/token', {
+    const response = await fetch('https://accounts.tiny.com.br/realms/tiny/protocol/openid-connect/token', {
       method: 'POST',
       headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
       body: params
     });
 
     const data = await response.json();
-    res.json({ message: 'Autenticação concluída com sucesso', data });
+
+    if (data.access_token) {
+      res.json({ message: '✅ Token recebido com sucesso!', token: data });
+    } else {
+      res.status(401).json({ error: 'Não foi possível obter o token', resposta: data });
+    }
   } catch (error) {
-    res.status(500).json({ error: 'Falha ao obter o token', details: error.message });
+    res.status(500).json({ error: 'Erro ao buscar token', detalhes: error.message });
   }
 }
