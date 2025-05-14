@@ -9,15 +9,15 @@ export async function POST(request) {
   try {
     const { endpoint, method, payload } = await request.json();
 
-    const tokenPath = path.join(__dirname, '..', 'token.json');
+    const tokenPath = path.join(__dirname, '..', 'utils', 'token.json');
     const tokenData = JSON.parse(readFileSync(tokenPath, 'utf-8'));
-    const accessToken = tokenData?.token?.access_token;
+    const accessToken = tokenData?.access_token;
 
     if (!accessToken) {
       return new Response(JSON.stringify({ erro: 'Token de acesso não encontrado' }), { status: 401 });
     }
 
-    const tinyUrl = `https://api.tiny.com.br/api/v3/${endpoint}`;
+    const tinyUrl = `https://api.tiny.com.br/public-api/v3/${endpoint}`;
     const tinyResponse = await fetch(tinyUrl, {
       method: method || 'GET',
       headers: {
@@ -27,7 +27,10 @@ export async function POST(request) {
       body: method === 'POST' ? JSON.stringify(payload) : undefined
     });
 
-    const result = await tinyResponse.json();
+    const result = await tinyResponse.json().catch(() => ({
+      erro: 'Resposta não está em formato JSON',
+      status: tinyResponse.status
+    }));
 
     return new Response(JSON.stringify(result), {
       status: tinyResponse.status,
