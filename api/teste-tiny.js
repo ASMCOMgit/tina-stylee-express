@@ -1,48 +1,43 @@
-import fs from 'fs';
+import { readFileSync } from 'fs';
 import path from 'path';
-import dotenv from 'dotenv';
-import fetch from 'node-fetch';
+import { fileURLToPath } from 'url';
 
-dotenv.config();
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
-export default async function handler(req, res) {
-  const tokenPath = path.resolve('utils/token.json');
-
-  if (!fs.existsSync(tokenPath)) {
-    return res.status(401).json({ erro: 'Token não encontrado. Faça login em /api/login' });
-  }
-
-  const tokenData = JSON.parse(fs.readFileSync(tokenPath, 'utf-8'));
-  const accessToken = tokenData.access_token;
-
-  const endpoint = req.method === 'GET' ? req.query.endpoint : req.body.endpoint;
-  const method = req.body.method || 'GET';
-  const payload = req.body.payload || null;
-
-  if (!endpoint) {
-    return res.status(400).json({ erro: 'Parâmetro "endpoint" é obrigatório.' });
-  }
-
-  const url = `${process.env.TINY_API_URL}/${endpoint}`;
-
+export async function POST(request) {
   try {
-    const response = await fetch(url, {
-      method,
+    const { endpoint, method, payload } = await request.json();
+
+    const tokenPath = path.join(__dirname, '..', 'token.json');
+    const tokenData = JSON.parse(readFileSync(tokenPath, 'utf-8'));
+    const accessToken = tokenData?.token?.access_token;
+
+    if (!accessToken) {
+      return new Response(JSON.stringify({ erro: 'Token de acesso não encontrado' }), { status: 401 });
+    }
+
+    const tinyUrl = `https://api.tiny.com.br/api/v3/${endpoint}`;
+    const tinyResponse = await fetch(tinyUrl, {
+      method: method || 'GET',
       headers: {
-        Authorization: `Bearer ${accessToken}`,
-        'Content-Type': 'application/json',
-        Accept: 'application/json'
+        'Authorization': `Bearer ${accessToken}`,
+        'Content-Type': 'application/json'
       },
-      body: method !== 'GET' && payload ? JSON.stringify(payload) : undefined
+      body: method === 'POST' ? JSON.stringify(payload) : undefined
     });
 
-    const resultado = await response.json().catch(() => ({
-      erro: 'Resposta não está em formato JSON',
-      status: response.status
-    }));
+    const result = await tinyResponse.json();
 
-    return res.status(200).json({ url, resultado });
-  } catch (err) {
-    return res.status(500).json({ erro: 'Falha ao consultar API Tiny', detalhes: err.message });
+    return new Response(JSON.stringify(result), {
+      status: tinyResponse.status,
+      headers: { 'Content-Type': 'application/json' }
+    });
+
+  } catch (error) {
+    return new Response(JSON.stringify({ erro: 'Erro ao chamar a API do Tiny', detalhes: error.message }), {
+      status: 500,
+      headers: { 'Content-Type': 'application/json' }
+    });
   }
 }
