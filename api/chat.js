@@ -1,6 +1,8 @@
 import { OpenAI } from 'openai';
-import { accessToken } from './auth.js';
 import dotenv from 'dotenv';
+import fs from 'fs';
+import path from 'path';
+import fetch from 'node-fetch';
 
 dotenv.config();
 
@@ -9,6 +11,14 @@ const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 export default async function chatHandler(req, res) {
   const { prompt } = req.body;
   if (!prompt) return res.status(400).json({ error: 'Prompt ausente' });
+
+  let accessToken = null;
+  const tokenPath = path.resolve('utils/token.json');
+  if (fs.existsSync(tokenPath)) {
+    const tokenData = JSON.parse(fs.readFileSync(tokenPath, 'utf-8'));
+    accessToken = tokenData.access_token;
+  }
+
   if (!accessToken) return res.status(401).json({ error: 'Token de autenticação não encontrado' });
 
   try {
