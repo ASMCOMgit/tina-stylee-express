@@ -27,7 +27,7 @@ export default async function chatHandler(req, res) {
       messages: [
         {
           role: 'system',
-          content: \`
+          content: `
 Você é a TINA, uma assistente virtual da STYLEE conectada ao Tiny ERP.
 Você pode receber qualquer pergunta, mas quando identificar comandos de gestão (como cadastro de produtos), responda com um JSON no seguinte formato:
 
@@ -51,7 +51,7 @@ Você pode receber qualquer pergunta, mas quando identificar comandos de gestão
 - Use "preco" (nunca "valor")
 - Sempre inclua os campos obrigatórios: nome, codigo, preco, estoque, unidade, tipo, situacao
 - Se a pergunta não for sobre o Tiny ERP, responda gentilmente como assistente comum.
-\`
+          `.trim()
         },
         { role: 'user', content: prompt }
       ]
