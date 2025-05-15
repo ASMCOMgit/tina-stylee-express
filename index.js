@@ -1,3 +1,4 @@
+// index.js
 import express from 'express';
 import dotenv from 'dotenv';
 import cors from 'cors';
@@ -13,13 +14,13 @@ const port = process.env.PORT || 3000;
 
 // Middlewares
 app.use(cors());
-app.use(express.json()); // ⚠️ Importante: deve vir antes das rotas que usam req.body
+app.use(express.json()); // deve vir antes das rotas que usam req.body
 
 // Rotas
-app.use('/api/teste-tiny', testeTinyRoute); // usa JSON
-app.use('/api/auth', authRoutes);
-app.post('/api/chat', chatHandler);         // usa JSON
-app.use('/api', imagemRouter);              // usa multipart/form-data
+app.use('/api/teste-tiny', testeTinyRoute); // JSON
+app.use('/api/auth', authRoutes);           // JSON
+app.post('/api/chat', chatHandler);         // JSON
+app.use('/api', imagemRouter);              // multipart/form-data
 
 // Início do servidor
 app.listen(port, () => {
