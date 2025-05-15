@@ -18,11 +18,13 @@ router.post('/imagem', async (req, res) => {
     produtos: [
       {
         produto: {
+          sequencia: '1',
           codigo,
           nome,
           unidade: 'UN',
           preco: '0.00',
           tipo: 'P',
+          origem: '0',
           situacao: 'A',
           imagens_externas: [
             {
