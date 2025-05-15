@@ -1,28 +1,25 @@
-// index.js
 import express from 'express';
-import dotenv from 'dotenv';
 import cors from 'cors';
-import authRoutes from './api/auth.js';
-import chatHandler from './api/chat.js';
-import imagemRouter from './api/imagem.js';
-import testeTinyRoute from './api/teste-tiny.js';
+import dotenv from 'dotenv';
+import path from 'path';
+import imagemRoute from './api/imagem.js';
+import { fileURLToPath } from 'url';
 
 dotenv.config();
 
 const app = express();
-const port = process.env.PORT || 3000;
+const PORT = process.env.PORT || 3000;
 
-// Middlewares
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
 app.use(cors());
-app.use(express.json()); // deve vir antes das rotas que usam req.body
+app.use(express.json());
+app.use(express.static(path.join(__dirname, 'public')));
 
 // Rotas
-app.use('/api/teste-tiny', testeTinyRoute); // JSON
-app.use('/api/auth', authRoutes);           // JSON
-app.post('/api/chat', chatHandler);         // JSON
-app.use('/api', imagemRouter);              // multipart/form-data
+app.use('/api', imagemRoute);
 
-// Início do servidor
-app.listen(port, () => {
-  console.log(`🚀 Servidor rodando em http://localhost:${port}`);
+app.listen(PORT, () => {
+  console.log(`🚀 Servidor rodando em http://localhost:${PORT}`);
 });
