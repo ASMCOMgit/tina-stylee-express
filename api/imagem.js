@@ -7,6 +7,7 @@ dotenv.config();
 
 const router = express.Router();
 
+// Rota para atualizar produto (incluindo imagem externa)
 router.post('/imagem/atualizar', async (req, res) => {
   try {
     const { codigo, nome, urlImagem, preco } = req.body;
