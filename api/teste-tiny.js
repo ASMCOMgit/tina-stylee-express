@@ -1,20 +1,23 @@
+// api/teste-tiny.js
+import express from 'express';
 import { readFileSync } from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
 
+const router = express.Router();
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-export async function POST(request) {
+router.post('/', async (req, res) => {
   try {
-    const { endpoint, method, payload } = await request.json();
+    const { endpoint, method, payload } = req.body;
 
     const tokenPath = path.join(__dirname, '..', 'utils', 'token.json');
     const tokenData = JSON.parse(readFileSync(tokenPath, 'utf-8'));
     const accessToken = tokenData?.access_token;
 
     if (!accessToken) {
-      return new Response(JSON.stringify({ erro: 'Token de acesso não encontrado' }), { status: 401 });
+      return res.status(401).json({ erro: 'Token de acesso não encontrado' });
     }
 
     const tinyUrl = `https://api.tiny.com.br/public-api/v3/${endpoint}`;
@@ -32,15 +35,14 @@ export async function POST(request) {
       status: tinyResponse.status
     }));
 
-    return new Response(JSON.stringify(result), {
-      status: tinyResponse.status,
-      headers: { 'Content-Type': 'application/json' }
+    res.status(tinyResponse.status).json({
+      url: tinyUrl,
+      resultado: result
     });
 
   } catch (error) {
-    return new Response(JSON.stringify({ erro: 'Erro ao chamar a API do Tiny', detalhes: error.message }), {
-      status: 500,
-      headers: { 'Content-Type': 'application/json' }
-    });
+    res.status(500).json({ erro: 'Erro ao chamar a API do Tiny', detalhes: error.message });
   }
-}
+});
+
+export default router;
