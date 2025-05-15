@@ -52,12 +52,12 @@ router.post('/imagem', async (req, res) => {
     const resultado = resposta.data;
     return res.json({ resultado });
   } catch (erro) {
-    console.error('Erro ao incluir produto com imagem:', erro);
+    console.error('Erro ao enviar produto com imagem para o Tiny:', erro);
     return res.status(500).json({ erro: 'Erro ao enviar produto com imagem para o Tiny', detalhes: erro.message });
   }
 });
 
-// ✅ NOVA ROTA: atualizar produto existente via V2
+// Nova rota: atualizar imagem de produto existente via API V2
 router.post('/imagem/atualizar', async (req, res) => {
   const { id, codigo, nome, urlImagem, preco } = req.body;
 
