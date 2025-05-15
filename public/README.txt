@@ -1,0 +1,1 @@
+Pasta pública para arquivos estáticos, como imagens ou páginas HTML.
