@@ -1,30 +1,27 @@
 import express from 'express';
 import dotenv from 'dotenv';
-import fs from 'fs';
-
-import testeTinyRoute from './routes/teste-tiny-express.js';
-import callbackHandler from './api/callback.js';
-import loginHandler from './api/login.js';
-import chatHandler from './api/chat.js';
+import cors from 'cors';
 import authRoutes from './api/auth.js';
+import chatHandler from './api/chat.js';
 import imagemRouter from './api/imagem.js';
+import testeTinyRoute from './api/teste-tiny.js';
 
 dotenv.config();
+
 const app = express();
-
-// ⚠️ Deixe o express.json() depois da imagem para evitar conflitos
-app.use('/api/teste-tiny', testeTinyRoute);
-app.use('/api/auth', authRoutes);
-app.post('/api/chat', chatHandler);
-app.use('/api', imagemRouter); // <- deve vir antes de app.use(express.json())
-
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
-
-app.get('/api/callback', callbackHandler);
-app.get('/api/login', loginHandler);
-
 const port = process.env.PORT || 3000;
+
+// Middlewares
+app.use(cors());
+app.use(express.json()); // ⚠️ Importante: deve vir antes das rotas que usam req.body
+
+// Rotas
+app.use('/api/teste-tiny', testeTinyRoute); // usa JSON
+app.use('/api/auth', authRoutes);
+app.post('/api/chat', chatHandler);         // usa JSON
+app.use('/api', imagemRouter);              // usa multipart/form-data
+
+// Início do servidor
 app.listen(port, () => {
   console.log(`🚀 Servidor rodando em http://localhost:${port}`);
 });
