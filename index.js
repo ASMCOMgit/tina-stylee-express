@@ -5,6 +5,7 @@ import loginHandler from './api/login.js';
 import dotenv from 'dotenv';
 import chatHandler from './api/chat.js';
 import authRoutes from './api/auth.js';
+import imagemRouter from './api/imagem.js';
 
 dotenv.config();
 const app = express();
@@ -13,6 +14,7 @@ app.use(express.json());
 app.use('/api/teste-tiny', testeTinyRoute);
 app.use('/api/auth', authRoutes);
 app.post('/api/chat', chatHandler);
+app.use('/api', imagemRouter);
 
 const port = process.env.PORT || 3000;
 app.listen(port, () => {
