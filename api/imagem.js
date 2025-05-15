@@ -5,10 +5,10 @@ import axios from 'axios';
 const router = express.Router();
 
 router.post('/imagem', async (req, res) => {
-  const { codigo, nome, urlImagem } = req.body;
+  const { codigo, nome, urlImagem, preco } = req.body;
 
-  if (!codigo || !nome || !urlImagem) {
-    return res.status(400).json({ erro: 'Parâmetros obrigatórios ausentes: codigo, nome ou urlImagem.' });
+  if (!codigo || !nome || !urlImagem || !preco) {
+    return res.status(400).json({ erro: 'Parâmetros obrigatórios ausentes: codigo, nome, urlImagem ou preco.' });
   }
 
   const tinyToken = process.env.TINY_API_TOKEN;
@@ -22,7 +22,7 @@ router.post('/imagem', async (req, res) => {
           codigo,
           nome,
           unidade: 'UN',
-          preco: '0.00',
+          preco,
           tipo: 'P',
           origem: '0',
           situacao: 'A',
