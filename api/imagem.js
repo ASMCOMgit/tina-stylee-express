@@ -26,11 +26,9 @@ router.post('/imagem', async (req, res) => {
           tipo: 'P',
           origem: '0',
           situacao: 'A',
-          imagens_externas: [
+          anexos: [
             {
-              imagem_externa: {
-                url: urlImagem
-              }
+              anexo: urlImagem
             }
           ]
         }
