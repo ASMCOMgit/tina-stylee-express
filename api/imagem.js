@@ -7,7 +7,7 @@ dotenv.config();
 
 const router = express.Router();
 
-// Rota para atualizar produto (incluindo imagem externa)
+// Rota para atualizar produto (incluindo imagem externa) usando API V2
 router.post('/imagem/atualizar', async (req, res) => {
   try {
     const { codigo, nome, urlImagem, preco } = req.body;
@@ -17,9 +17,9 @@ router.post('/imagem/atualizar', async (req, res) => {
         {
           produto: {
             sequencia: '1',
-            codigo: codigo,
-            nome: nome,
-            preco: preco,
+            codigo,
+            nome,
+            preco,
             origem: '0',
             situacao: 'A',
             tipo: 'P',
@@ -36,13 +36,19 @@ router.post('/imagem/atualizar', async (req, res) => {
     };
 
     const formData = new FormData();
-    formData.append('token', process.env.TOKEN_TINY);
-    formData.append('formato', 'JSON');
+    formData.append('token', process.env.TINY_API_TOKEN);
+    formData.append('formato', 'json');
     formData.append('produto', JSON.stringify(produto));
 
-    const response = await axios.post('https://api.tiny.com.br/api2/produto.alterar.php', formData, {
-      headers: formData.getHeaders(),
-    });
+    const response = await axios.post(
+      'https://api.tiny.com.br/api2/produto.alterar.php',
+      formData,
+      {
+        headers: {
+          ...formData.getHeaders(),
+        },
+      }
+    );
 
     res.json({ resultado: response.data });
   } catch (error) {
